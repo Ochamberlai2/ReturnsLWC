@@ -14,6 +14,13 @@
             <objects>
                 <object>Contact</object>
             </objects>
+            <property
+        label="Default refund delay time"
+        name="refundDelayTime"
+        type="Integer"
+        default="7"
+      />
+          
         </targetConfig>
     </targetConfigs>
 </LightningComponentBundle>
