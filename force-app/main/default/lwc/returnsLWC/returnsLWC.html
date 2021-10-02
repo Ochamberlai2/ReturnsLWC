@@ -1,7 +1,12 @@
 <template>
-  <lightning-card title="Refund Calculator">
-    <lightning-record-form object-api-name="Contact">
-      <!-- <lightning-input-field field-name=""/> -->
+  <lightning-card title="Refunds Console">
+    <lightning-record-form
+      object-api-name="Refund_Request__c"
+      fields={fields}
+      onsubmit={handleSubmit}
+      onsuccess={handleSuccess}
+      columns="1"
+    >
     </lightning-record-form>
   </lightning-card>
 </template>
