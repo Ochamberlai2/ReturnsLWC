@@ -1,12 +1,20 @@
 <template>
   <lightning-card title="Refunds Console">
-    <lightning-record-form
-      object-api-name="Refund_Request__c"
-      fields={fields}
-      onsubmit={handleSubmit}
-      onsuccess={handleSuccess}
-      columns="1"
-    >
-    </lightning-record-form>
+    <template if:false={recordHasBeenSaved}>
+      <lightning-record-form
+        object-api-name="Refund_Request__c"
+        fields={fields}
+        onsubmit={handleSubmit}
+        onsuccess={handleSuccess}
+        columns="1"
+      >
+      </lightning-record-form>
+    </template>
+    <template if:true={recordHasBeenSaved}>
+      <c-star-rating
+        refund-request={refundRequestId}
+        oncompletionevent={handleRatingCompletion}
+      ></c-star-rating>
+    </template>
   </lightning-card>
 </template>

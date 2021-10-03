@@ -31,8 +31,9 @@ export default class ReturnsLWC extends NavigationMixin(LightningElement) {
   @api refundDelayTime;
 
   //local variables
+  recordHasBeenSaved = false;
   refundRequestFields;
-
+  refundRequestId;
   //expose object fields
   fields = [
     REFUND_REQUEST_CONTACT_FIELD,
@@ -48,6 +49,7 @@ export default class ReturnsLWC extends NavigationMixin(LightningElement) {
     const createdRecordId = this.template.querySelector(
       "lightning-record-form"
     ).recordId;
+    this.refundRequestId = createdRecordId;
 
     try {
       const refundRecord = await this.createRefundRecord(createdRecordId);
@@ -77,6 +79,7 @@ export default class ReturnsLWC extends NavigationMixin(LightningElement) {
 
       //Reset the form
       this.template.querySelector("lightning-record-form").recordId = null;
+      this.recordHasBeenSaved = true;
     } catch (e) {
       console.error(e.body);
     }
@@ -151,5 +154,12 @@ export default class ReturnsLWC extends NavigationMixin(LightningElement) {
       console.error(e.body);
     }
     return null;
+  }
+
+  handleRatingCompletion() {
+    //Completion event returns true when completed.
+    //We want the inverse of this to reset the form
+    this.recordHasBeenSaved = false;
+    this.refundRequestId = null;
   }
 }
