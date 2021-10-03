@@ -34,6 +34,42 @@ public with sharing class RefundsConsoleControllerTest {
         System.assertEquals(false, hasProduct, 'The contact owns the specified product');
     }
 
+
+/*
+     * Input: A contact Id and a product which is linked to an asset. The asset has been refunded
+     * Expected output: True
+     */
+    @IsTest
+    static void contactHasRefundedAsset(){
+        //Setup
+        Contact contact = [SELECT Id FROM Contact LIMIT 1];
+        Product2 product1 = [SELECT Id FROM Product2 WHERE Name='Product 1' LIMIT 1];
+        Asset asset = [SELECT Id, Refunded__c FROM Asset LIMIT 1];
+        asset.Refunded__c = true;
+        update asset;
+        //Execution
+        Boolean isRefunded = RefundsConsoleController.ContactHasRefundedProduct(contact.Id, product1.Id);
+
+        //Assertions
+        System.assertEquals(true, isRefunded, 'The contact has not refunded the specified product');
+    }
+
+    /*
+     * Input: A contact Id and a product which is not linked to an asset. The asset has not been refunded
+     * Expected output: False
+     */
+    @IsTest
+    static void contactHasntRefundedAsset(){
+        //Setup
+        Contact contact = [SELECT Id FROM Contact LIMIT 1];
+        Product2 product2 = [SELECT Id FROM Product2 WHERE Name='Product 2' LIMIT 1];
+        //Execution
+        Boolean isRefunded = RefundsConsoleController.ContactHasRefundedProduct(contact.Id, product2.Id);
+        
+        //Assertions
+        System.assertEquals(false, isRefunded, 'The contact has refunded the specified product');
+    }
+
     /*
      * Input: A contact Id and a product which is linked to an asset 
      * Expected output: 40

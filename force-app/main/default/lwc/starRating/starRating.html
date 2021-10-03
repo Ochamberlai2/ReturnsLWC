@@ -1,7 +1,9 @@
 <template>
   <div class="component-container">
     <span
-      ><h2 class="instruction-text">Please enter the customer's rating...</h2>
+      ><h2 lang={lang} dir={dir} class="instruction-text">
+        Please enter the customer's rating...
+      </h2>
     </span>
     <div class="rate">
       <input
@@ -51,6 +53,7 @@
         label="Submit"
         title="Submit"
         onclick={createReview}
+        onkeypress={handleKeypress}
       ></lightning-button>
     </div>
   </div>

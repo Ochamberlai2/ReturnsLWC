@@ -2,9 +2,11 @@ import { LightningElement, api } from "lwc";
 import { ShowToastEvent } from "lightning/platformShowToastEvent";
 import { NavigationMixin } from "lightning/navigation";
 import { createRecord } from "lightning/uiRecordApi";
-
+import LANG from "@salesforce/i18n/lang";
+import DIR from "@salesforce/i18n/dir";
 //Methods
 import ContactOwnsAsset from "@salesforce/apex/RefundsConsoleController.ContactOwnsAsset";
+import ContactHasRefundedProduct from "@salesforce/apex/RefundsConsoleController.ContactHasRefundedProduct";
 import GetRefundAmount from "@salesforce/apex/RefundsConsoleController.GetRefundAmount";
 
 //Utils
@@ -34,6 +36,9 @@ export default class ReturnsLWC extends NavigationMixin(LightningElement) {
   recordHasBeenSaved = false;
   refundRequestFields;
   refundRequestId;
+  lang = LANG;
+  dir = DIR;
+
   //expose object fields
   fields = [
     REFUND_REQUEST_CONTACT_FIELD,
@@ -89,20 +94,10 @@ export default class ReturnsLWC extends NavigationMixin(LightningElement) {
     event.preventDefault();
     const { Contact__c, Item_Name__c } = event.detail.fields;
     try {
-      const ownsAsset = await ContactOwnsAsset({
-        contactId: Contact__c,
-        productId: Item_Name__c
-      });
+      const validInput = await this.validateInput(Contact__c, Item_Name__c);
 
-      if (!ownsAsset) {
-        const evt = new ShowToastEvent({
-          title: "Error!",
-          message: "This contact does not own the selected product!",
-          variant: "error"
-        });
-        this.dispatchEvent(evt);
-        return;
-      }
+      if (!validInput) return;
+
       this.refundRequestFields = event.detail.fields;
       //Submit the form
       this.template
@@ -112,6 +107,39 @@ export default class ReturnsLWC extends NavigationMixin(LightningElement) {
       console.error(e.body);
       throw e;
     }
+  }
+
+  async validateInput(contactId, itemName) {
+    const ownsAsset = await ContactOwnsAsset({
+      contactId: contactId,
+      productId: itemName
+    });
+
+    if (!ownsAsset) {
+      const evt = new ShowToastEvent({
+        title: "Error!",
+        message: "This contact does not own the selected product!",
+        variant: "error"
+      });
+      this.dispatchEvent(evt);
+      return false;
+    }
+
+    const hasRefunded = await ContactHasRefundedProduct({
+      contactId: contactId,
+      productId: itemName
+    });
+
+    if (hasRefunded) {
+      const evt = new ShowToastEvent({
+        title: "Error!",
+        message: "This contact has already refunded this product!",
+        variant: "error"
+      });
+      this.dispatchEvent(evt);
+      return false;
+    }
+    return true;
   }
 
   async getNavURL(recordId) {

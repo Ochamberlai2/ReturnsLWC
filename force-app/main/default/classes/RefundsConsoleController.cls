@@ -22,6 +22,24 @@ public with sharing class RefundsConsoleController {
    }
 
     /*
+    * Returns true if the specified contact has already refunded the specified product
+    * Ownership is represented via asset
+    *
+    * @param   contactId   Represents the contact owning an asset
+    * @param   productId   Represents the product  related to an asset
+    */
+    @AuraEnabled(cacheable=true)
+    public static Boolean ContactHasRefundedProduct(Id contactId, Id productId){
+       
+        //Write into a list of assets to avoid an exception if no results are returned
+        List<Asset> queriedAssets = new List<Asset>();
+        queriedAssets = [SELECT Id FROM Asset WHERE Product2Id =: productId AND ContactId =: contactId AND Refunded__c = true];
+
+        return !queriedAssets.isEmpty();
+
+   }
+
+    /*
     * Returns the value to be refunded based on the purchase price listed on the asset
     *
     * @param   contactId   Represents the contact owning an asset

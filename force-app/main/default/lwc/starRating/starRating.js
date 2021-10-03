@@ -2,9 +2,12 @@ import { LightningElement, api } from "lwc";
 import { createRecord } from "lightning/uiRecordApi";
 import { ShowToastEvent } from "lightning/platformShowToastEvent";
 import UID from "@salesforce/user/Id";
+import LANG from "@salesforce/i18n/lang";
+import DIR from "@salesforce/i18n/dir";
 
 //Objects
 import AGENT_REVIEW_OBJECT from "@salesforce/schema/Agent_Review__c";
+
 //Fields
 import AGENT_REVIEW_AGENT_FIELD from "@salesforce/schema/Agent_Review__c.Agent__c";
 import AGENT_REVIEW_STAR_RATING_FIELD from "@salesforce/schema/Agent_Review__c.Star_Rating__c";
@@ -13,6 +16,9 @@ import AGENT_REVIEW_REFUND_REQUEST_FIELD from "@salesforce/schema/Agent_Review__
 export default class StarRating extends LightningElement {
   starRating;
   @api refundRequest;
+
+  lang = LANG;
+  dir = DIR;
 
   handleRatingChange(event) {
     this.starRating = event.target.value;
@@ -49,5 +55,11 @@ export default class StarRating extends LightningElement {
     //Propogate event to parent in order to reset the lwc
     const completionEvent = new CustomEvent("completionevent");
     this.dispatchEvent(completionEvent);
+  }
+
+  handleKeypress(event) {
+    if (event.keycode === 13) {
+      this.createReview();
+    }
   }
 }
